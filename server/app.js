@@ -1,5 +1,9 @@
 import express from 'express';
 import { createServer } from "http";
+import { connect } from 'http2';
+
+
+
 import { Server } from "socket.io";
 
 const app = express()
@@ -12,6 +16,18 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket) => {
   console.log("подключен", socket)
+  socket.emit('connected', {
+    messege: "подключился!!!"
+  });
+socket.on('message', (arg) => {
+    console.log(arg); 
+  });
+
+  socket.on("disconnect", (reason) => {
+    console.log(reason)
+  });
 });
+
+
 
 httpServer.listen(3002);

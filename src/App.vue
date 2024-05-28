@@ -2,7 +2,13 @@
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 import { io } from "socket.io-client";
-const socket = io("http://localhost:3002")
+
+const socket = io("http://localhost:3002");
+
+
+socket.on("connected", (arg) => {
+  console.log(arg); 
+});
 </script>
 
 <template>
