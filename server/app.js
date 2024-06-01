@@ -2,7 +2,7 @@
   import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { Script } from "vm";
+
 
 
 const app = express();
@@ -25,15 +25,13 @@ io.on("connection", (socket) => {
   socket.emit("connected", {
     message: "успешное подключение",
   });
-
   //получаем сообщение от клиента и перенаправляем обратно на сторону клиента 
-  socket.on('user_message', (value)=>{
-    // console.log(value)
-    socket.emit('server_message', value)
+  socket.on('user_message', (data)=>{
+    socket.leave('room' + data.roomId)
+    socket.join('room' + data.roomId)
+      io.to('room' + data.roomId).emit('server_message', data.message)
   })
-
 });
-
 
 httpServer.listen(3002, async()=>{
   console.log("сокит сервер запущен 3002");
