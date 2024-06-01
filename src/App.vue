@@ -4,9 +4,13 @@ import { io } from "socket.io-client";
 
 const socket = io("http://localhost:3002");
 
+socket.on('connected', (message)=>{
+  console.log(message)
+})
+
 socket.on('connect', () => {
-  console.log('подключился клиент');
-});
+  console.log('подключился клиент')
+  })
 
 socket.on('disconnect', () => {
   console.log('отключился клиент');
