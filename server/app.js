@@ -1,33 +1,32 @@
-import express from 'express';
+
+import express from "express";
 import { createServer } from "http";
-import { connect } from 'http2';
-
-
-
 import { Server } from "socket.io";
 
-const app = express()
 
+const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, { 
-    cors: {
-    origin: 'http://localhost:5173'
-  }});
+const io = new Server(httpServer, {
+  cors: {
+  origin: "http://localhost:5173",
+},
+});
 
+//запуск сокет сервера
 io.on("connection", (socket) => {
-  console.log("подключен", socket)
-  socket.emit('connected', {
-    messege: "подключился!!!"
-  });
-socket.on('message', (arg) => {
-    console.log(arg); 
-  });
+  console.log("a user connected", socket);
+});
 
-  socket.on("disconnect", (reason) => {
-    console.log(reason)
-  });
+httpServer.listen(3002, async()=>{
+  console.log("сокит сервер запущен 3002");
 });
 
 
+//маршруты
+app.get("/", function (req, res) {
+  res.send('12345678');
+});
+app.listen(3003, async () => {
+  console.log("веб сервер запущен 3003");
+});
 
-httpServer.listen(3002);

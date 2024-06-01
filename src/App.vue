@@ -1,14 +1,17 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:3002");
 
-
-socket.on("connected", (arg) => {
-  console.log(arg); 
+socket.on('connect', () => {
+  console.log('подключился клиент');
 });
+
+socket.on('disconnect', () => {
+  console.log('отключился клиент');
+});
+
 </script>
 
 <template>
