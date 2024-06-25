@@ -31,6 +31,20 @@ io.on("connection", (socket) => {
     socket.join('room' + data.roomId)
       io.to('room' + data.roomId).emit('server_message', data.message)
   })
+//чат 1на 1
+  socket.on("private_message", (data) => {
+    const recipientSocket = io.sockets.sockets[data.recipientId];
+    if (recipientSocket) {
+      recipientSocket.emit("private_message", data.message);
+    }
+  });
+  // получаем список пользователей
+  socket.on("get_user_list", () => {
+    const users = [];
+   
+    io.emit("user_list", users);
+  });
+  
 });
 
 httpServer.listen(3002, async()=>{

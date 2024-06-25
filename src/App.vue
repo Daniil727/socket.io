@@ -16,6 +16,12 @@ socket.on('disconnect', () => {
   console.log('отключился клиент');
 });
 
+//Получаем список пользователей
+socket.on('user_list', (users) => {
+  console.log(`User list: ${users}`);
+});
+
+
 </script>
 
 <template>
@@ -33,6 +39,7 @@ socket.on('disconnect', () => {
   </header>
 
   <RouterView />
+  <UserList :users="users" />
 </template>
 
 <style scoped>
