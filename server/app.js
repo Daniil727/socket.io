@@ -2,7 +2,7 @@
   import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-
+import * as mysql  from "mysql";
 
 
 const app = express();
@@ -12,6 +12,56 @@ const io = new Server(httpServer, {
   origin: "http://localhost:5173",
 },
 });
+
+
+const db = mysql.createConnection({
+  host: 'MySQL-8.0',
+  user: 'root',
+  password: '',
+  database: 'chat'
+});
+db.connect((err) => {
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+    return;
+  }
+  console.log('Connected to MySQL');
+});
+
+
+const users = {};
+
+app.post('/register', (req, res) => {
+  const { username, password } = req.body;
+  const user = { username, password };
+  users[username] = user;
+  res.send(`User ${username} registered successfully`);
+});
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  if (users[username] && users[username].password === password) {
+    res.send(`User ${username} logged in successfully`);
+  } else {
+    res.status(401).send('Invalid username or password');
+  }
+});
+
+io.on('connection', (socket) => {
+  socket.on('user_message', (data) => {
+    const { message, roomId, username } = data;
+    // сохранение в бд
+    db.query(`INSERT INTO messages (room_id, user_id, message) VALUES (?, ?, ?)`, [roomId, username, message], (err, results) => {
+      if (err) {
+        console.error('Error saving message to MySQL:', err);
+      }
+    });
+//сообщение в комнату
+    io.to(`room${roomId}`).emit('server_message', message);
+  });
+});
+
+
 //маршруты
 app.get("/", function (req, res) {
   res.send('12345678');

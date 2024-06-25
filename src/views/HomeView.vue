@@ -4,9 +4,47 @@ import { connect, io } from "socket.io-client";
 const socket = io("http://localhost:3002");
 const message = ref('');
 const roomId = ref(null);
-const messages = ref([]); //стоило-бы хранить сообщения со стороны сервера, но пока что так...
+const messages = ref([]); 
+const username = ref(null);
 const privateMessage = ref('');
 const recipientId = ref(null);
+
+
+// регистрация
+async function registerUser() {
+  const { username, password } = await fetch('/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  username.value = username;
+}
+
+// Login 
+async function loginUser() {
+  const { username, password } = await fetch('/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  username.value = username;
+}
+
+// отправка сообщений
+function sendMessage() {
+  socket.emit('user_message', {
+    message: message.value,
+    roomId: roomId.value,
+    username: username.value,
+  });
+  message.value = '';
+}
+
+// получение сообщений
+socket.on('server_message', (message) => {
+  messages.value.push(message);
+});
+
 
 //получаем сообщение с сервера пушим в массив messages
 socket.on('connect', () => {
@@ -25,7 +63,7 @@ function send() {
   message.value = '';
 }
 
-// Send private message
+// отправка личных сообщений
 function sendPrivateMessage() {
   socket.emit('private_message', {
     message: privateMessage.value,
@@ -53,6 +91,11 @@ socket.on('private_message', (message) => {
     <div v-for="(message, index) in messages" :key="index">
       {{ message }}
     </div>
+    <div>
+      <input type="text" v-model="username" placeholder="Username">
+      <button @click="registerUser">клик</button>
+    </div>
+    
   </div>
 </template>
 
